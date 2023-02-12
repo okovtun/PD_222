@@ -109,6 +109,27 @@ public:
 	}
 };
 
+class Car
+{
+	Engine engine;
+	Tank tank;
+public:
+	Car(int volume, int consumption) :tank(volume), engine(consumption)
+	{
+		cout << "Your car is ready, press Enter to get in" << endl;
+	}
+	~Car()
+	{
+		cout << "Car is over" << endl;
+	}
+
+	void info()const
+	{
+		tank.info();
+		engine.info();
+	}
+};
+
 //#define TANK_CHECK
 //Некоторым макросам дают только имя, и не дают никакого значения,
 //такие макросы используются с директивами условной компиляции #ifdef ... #endif
@@ -136,5 +157,6 @@ void main()
 	engine.info();
 #endif // ENGINE_CHECK
 
-
+	Car bmw(80, 12);
+	bmw.info();
 }
