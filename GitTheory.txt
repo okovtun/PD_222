@@ -1,0 +1,16 @@
+VCS - Version Constrol System
+
+SVN, Subversion, Mercury, .... 
+Git, GitHub
+Git != GitHub
+Git - система контроля версий
+GitHub - это облачное хранилище.
+
+Repository - это хранилище исходных кодов.
+Репозиторий - это самая обыная папка с файлами.
+fetch, pull и push
+
+commit - это контрольная точка, в которую сохраняется текущее состояние 
+		 всех файлов репозитория.
+
+branch - это последовательность commit-ов.
