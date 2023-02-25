@@ -75,21 +75,27 @@ class Engine
 
 	const double CONSUMPTION;
 	double consumption_per_second;
+	double default_consumption_per_second;
 	bool is_started;
 public:
 	double get_CONSUMPTION()const
 	{
 		return this->CONSUMPTION;
 	}
-	double get_consumption_per_second(int speed)
+	double get_consumption_per_second(int speed, bool gas_pressed)
 	{
-		if (speed > 200) consumption_per_second = CONSUMPTION * 3e-5 * 10;
-		else if (speed > 140)consumption_per_second = CONSUMPTION * 3e-5*8.33333;
-		else if (speed > 100)consumption_per_second = CONSUMPTION * 3e-5*6.66666;
-		else if (speed > 60)consumption_per_second = CONSUMPTION * 3e-5*4.66666;
-		else if (speed > 0)consumption_per_second = CONSUMPTION * 3e-5*6.66666;
-		else consumption_per_second = CONSUMPTION * 3e-5;
-		return this->consumption_per_second;
+		if (!started())return 0;
+		if (gas_pressed)
+		{
+			if (speed > 200) consumption_per_second = CONSUMPTION * 3e-5 * 10;
+			else if (speed > 140)consumption_per_second = CONSUMPTION * 3e-5*8.33333;
+			else if (speed > 100)consumption_per_second = CONSUMPTION * 3e-5*6.66666;
+			else if (speed > 60)consumption_per_second = CONSUMPTION * 3e-5*4.66666;
+			else if (speed > 0)consumption_per_second = CONSUMPTION * 3e-5*6.66666;
+			else consumption_per_second = CONSUMPTION * 3e-5;
+			return this->consumption_per_second;
+		}
+		else return default_consumption_per_second;
 	}
 	Engine(int consumption) :CONSUMPTION
 	(
@@ -98,7 +104,7 @@ public:
 		consumption
 	)
 	{
-		consumption_per_second = CONSUMPTION * 3e-5;	//3*10^-5
+		consumption_per_second = default_consumption_per_second = CONSUMPTION * 3e-5;	//3*10^-5
 		is_started = false;
 		cout << "EConstructor:\t" << this << endl;
 	}
@@ -136,6 +142,7 @@ class Car
 	static const int MAX_SPEED_HIGH_LIMIT = 390;
 	int speed;
 	const int MAX_SPEED;
+	bool gas_pedal;
 	struct Control
 	{
 		std::thread panel_thread;
@@ -153,6 +160,7 @@ public:
 	{
 		driver_inside = false;
 		speed = 0;
+		gas_pedal = false;
 		cout << "Your car is ready, press Enter to get in" << endl;
 	}
 	~Car()
@@ -191,11 +199,15 @@ public:
 	}
 	void accellerate()
 	{
-		if (engine.started() && speed < MAX_SPEED)
+		if (driver_inside)
 		{
-			speed += 10;
-			if (speed > MAX_SPEED)speed = MAX_SPEED;
-			std::this_thread::sleep_for(1s);
+			gas_pedal = true;
+			if (engine.started() && speed < MAX_SPEED)
+			{
+				speed += 10;
+				if (speed > MAX_SPEED)speed = MAX_SPEED;
+				std::this_thread::sleep_for(1s);
+			}
 		}
 		if (!threads.free_wheeling_thread.joinable())
 			threads.free_wheeling_thread = std::thread(&Car::free_wheeling, this);
@@ -236,6 +248,7 @@ public:
 				stop_engine();
 				get_out();
 			}
+			gas_pedal = false;
 			if (tank.get_fuel_level() == 0)stop_engine();
 			if (speed <= 0)speed = 0;
 			if (speed == 0 && threads.free_wheeling_thread.joinable())threads.free_wheeling_thread.join();
@@ -244,7 +257,7 @@ public:
 	void engine_edle()
 	{
 		//Холостой ход двигателя
-		while (engine.started() && tank.give_fuel(engine.get_consumption_per_second(speed)))
+		while (engine.started() && tank.give_fuel(engine.get_consumption_per_second(speed, gas_pedal)))
 		{
 			std::this_thread::sleep_for(1s);
 		}
@@ -281,8 +294,9 @@ public:
 				SetConsoleTextAttribute(hConsole, 0x07);	//0xCF:'0'- черный фон, '7'- серые буквы.
 			}
 			cout << endl;
-			cout << "Consumption per second: " << engine.get_consumption_per_second(speed) << " liters.\n";
+			cout << "Consumption per second: " << engine.get_consumption_per_second(speed, gas_pedal) << " liters.\n";
 			cout << "Engine " << (engine.started() ? "started" : "stopped") << "\n";
+			cout << "Gas " << (gas_pedal ? "pressed" : "") << endl;
 			std::this_thread::sleep_for(1s);
 		}
 	}
@@ -321,7 +335,7 @@ void main()
 	engine.info();
 #endif // ENGINE_CHECK
 
-	Car bmw(80, 10);
+	Car bmw(80, 20);
 	bmw.info();
 
 	bmw.control();
