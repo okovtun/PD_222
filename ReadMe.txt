@@ -4,6 +4,12 @@ https://www.youtube.com/watch?v=KKc9msMJD-0&list=PLeqyOOqxeiIN08HuUsq0wlKww3BS3n
 https://legacy.cplusplus.com/doc/tutorial/
 
 TODO:
+1. ѕри запуске программы в поле Login должно высвечиватьс€ приглашение "¬ведите им€ пользовател€", 
+   при переводе фокуса на это поле приглашение исчезает. 
+   ≈сли пользователь ничего не ввеле, и перевел фокус на другой элемент интерфейса, то приглашение снова по€вл€етс€.
+   https://learn.microsoft.com/en-us/windows/win32/controls/about-edit-controls#edit-control-notification-messages
+
+DONE:
 ѕ€ть проектов на выбор залить на GitHub, и прислать ссылку на свою учетную запись.
 
 DONE:
