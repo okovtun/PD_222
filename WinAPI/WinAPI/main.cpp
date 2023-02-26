@@ -48,41 +48,38 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 	case WM_COMMAND:	//Обрабатывает сообщения нажатия на кнопки и т.д.
+	{
+		CONST INT SIZE = 256;
+		CHAR sz_buffer[SIZE] = {};
+		HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
+		HWND hEditPassword = GetDlgItem(hwnd, IDC_EDIT_PASSWORD);
 		switch (LOWORD(wParam))
 		{
 		case IDC_EDIT_LOGIN:
 			if (HIWORD(wParam) == EN_SETFOCUS)
 			{
-				CONST INT SIZE = 256;
-				CHAR sz_buffer[SIZE] = {};
-				HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
 				SendMessage(hEditLogin, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
 				if (strcmp(sz_buffer, g_sz_DEFAULT_LOFIN_MESSAGE) == 0)
 					SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)"");
 			}
 			if (HIWORD(wParam) == EN_KILLFOCUS)
 			{
-				CONST INT SIZE = 256;
-				CHAR sz_buffer[SIZE] = {};
-				HWND hEdit = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
-				SendMessage(hEdit, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
+				SendMessage(hEditLogin, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
 				if (strcmp(sz_buffer, "") == 0)
-					SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)g_sz_DEFAULT_LOFIN_MESSAGE);
+					SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)g_sz_DEFAULT_LOFIN_MESSAGE);
 			}
 			break;
 		case IDC_BUTTON_COPY:
 		{
-			HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
-			HWND hEditPassword = GetDlgItem(hwnd, IDC_EDIT_PASSWORD);
-			CONST INT SIZE = 256;
-			CHAR sz_buffer[SIZE] = {};
 			SendMessage(hEditLogin, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
 			SendMessage(hEditPassword, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
+
 		break;
 		case IDOK:		MessageBox(hwnd, "Была нажата кнопка OK", "Info", MB_OK | MB_ICONINFORMATION); break;
 		case IDCANCEL:	EndDialog(hwnd, 0); break;
 		}
+	}
 		break;
 	case WM_CLOSE:EndDialog(hwnd, 0);
 	}
